@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Diagnostics;
 using System.IO;
+using System.Text.RegularExpressions;
 
 namespace ExecutorFrontend
 {
@@ -54,12 +55,36 @@ namespace ExecutorFrontend
             numEndHour.Value = Properties.Settings.Default.nightModeEnd;
             chkShowWindows.Checked = Properties.Settings.Default.showWindows;
             chkRestartStuck.Checked = Properties.Settings.Default.restartStuck;
+            numStuckTimeout.Value = Properties.Settings.Default.stuckTimeout;
+            txtUsername.Text = Properties.Settings.Default.username;
         }
 
         private void txtCommand_TextChanged(object sender, EventArgs e)
         {
-            Properties.Settings.Default.command = txtCommand.Text;
-            Properties.Settings.Default.Save();
+            var newCommand = txtCommand.Text;
+            if(newCommand.StartsWith("start"))
+            {
+                newCommand = txtCommand.Text.Substring(5).Trim();
+            }
+
+            if(newCommand.Contains("bruteforcer_name"))
+            {
+                var username = "";
+                newCommand = Regex.Replace(newCommand, @"\+svar_set ""bruteforcer_name (.*)""", (match) =>
+                {
+                    username = match.Groups[1].Value;
+                    return "";
+                });
+                txtUsername.Text = username;
+
+            }
+
+            if (newCommand != txtCommand.Text)
+            {
+                txtCommand.Text = newCommand;
+                Properties.Settings.Default.command = newCommand;
+                Properties.Settings.Default.Save();
+            }
         }
 
         private void txtWorkDir_TextChanged(object sender, EventArgs e)
@@ -312,11 +337,17 @@ namespace ExecutorFrontend
         private string GetCommandLine(int id)
         {
             var parts = txtCommand.Text.Split(new char[] { ' ' }, 2);
-            if(chkRestartStuck.Checked) {
-                return $"{parts[1]} -condebug +con_logfile instance_{id}.log";
+            var ret = parts[1];
+            if(!string.IsNullOrWhiteSpace(txtUsername.Text))
+            {
+                ret += $@" +svar_set ""bruteforcer_name {txtUsername.Text}""";
             }
 
-            return parts[1];
+            if(chkRestartStuck.Checked) {
+                ret += $" -condebug +con_logfile instance_{id}.log";
+            }
+
+            return ret;
         }
 
         private void KillInstance(Instance inst)
@@ -365,6 +396,16 @@ namespace ExecutorFrontend
         private void chkRestartStuck_CheckedChanged(object sender, EventArgs e)
         {
             Properties.Settings.Default.restartStuck = chkRestartStuck.Checked;
+        }
+
+        private void numStuckTimeout_ValueChanged(object sender, EventArgs e)
+        {
+            Properties.Settings.Default.stuckTimeout = (int)numStuckTimeout.Value;
+        }
+
+        private void txtUsername_TextChanged(object sender, EventArgs e)
+        {
+            Properties.Settings.Default.username = txtUsername.Text;
         }
     }
 }

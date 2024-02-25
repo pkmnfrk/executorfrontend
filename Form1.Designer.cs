@@ -53,11 +53,14 @@
             this.label7 = new System.Windows.Forms.Label();
             this.label8 = new System.Windows.Forms.Label();
             this.txtUsername = new System.Windows.Forms.TextBox();
+            this.label9 = new System.Windows.Forms.Label();
+            this.numActionDelay = new System.Windows.Forms.NumericUpDown();
             ((System.ComponentModel.ISupportInitialize)(this.numDayCount)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numStartHour)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numEndHour)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numNightCount)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numStuckTimeout)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numActionDelay)).BeginInit();
             this.SuspendLayout();
             // 
             // label1
@@ -263,6 +266,7 @@
             this.chkShowWindows.TabIndex = 15;
             this.chkShowWindows.Text = "Show Windows";
             this.chkShowWindows.UseVisualStyleBackColor = true;
+            this.chkShowWindows.Visible = false;
             this.chkShowWindows.CheckedChanged += new System.EventHandler(this.chkShowWindows_CheckedChanged);
             // 
             // chkRestartStuck
@@ -323,11 +327,41 @@
             this.txtUsername.TabIndex = 2;
             this.txtUsername.TextChanged += new System.EventHandler(this.txtUsername_TextChanged);
             // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Location = new System.Drawing.Point(15, 119);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(150, 13);
+            this.label9.TabIndex = 19;
+            this.label9.Text = "&Min Time Between Actions (s):";
+            // 
+            // numActionDelay
+            // 
+            this.numActionDelay.Location = new System.Drawing.Point(166, 117);
+            this.numActionDelay.Maximum = new decimal(new int[] {
+            300,
+            0,
+            0,
+            0});
+            this.numActionDelay.Name = "numActionDelay";
+            this.numActionDelay.Size = new System.Drawing.Size(63, 20);
+            this.numActionDelay.TabIndex = 20;
+            this.toolTip1.SetToolTip(this.numActionDelay, "How long to wait between actions if multiple need to happen");
+            this.numActionDelay.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.numActionDelay.ValueChanged += new System.EventHandler(this.numActionDelay_ValueChanged);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(605, 461);
+            this.Controls.Add(this.numActionDelay);
+            this.Controls.Add(this.label9);
             this.Controls.Add(this.label7);
             this.Controls.Add(this.numStuckTimeout);
             this.Controls.Add(this.chkRestartStuck);
@@ -360,6 +394,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.numEndHour)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numNightCount)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numStuckTimeout)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numActionDelay)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -391,6 +426,8 @@
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.TextBox txtUsername;
+        private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.NumericUpDown numActionDelay;
     }
 }
 

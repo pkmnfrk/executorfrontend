@@ -18,7 +18,7 @@ namespace ExecutorFrontend
     {
         private List<Instance> processes = new List<Instance>();
         private bool freshStart = false;
-
+        private const int updateTimerInterval = 60_000;
         public Form1()
         {
             InitializeComponent();
@@ -46,6 +46,7 @@ namespace ExecutorFrontend
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            
             txtCommand.Text = Properties.Settings.Default.command;
             txtWorkDir.Text = Properties.Settings.Default.workDir;
             numDayCount.Value = Properties.Settings.Default.instanceCount;
@@ -57,6 +58,7 @@ namespace ExecutorFrontend
             chkRestartStuck.Checked = Properties.Settings.Default.restartStuck;
             numStuckTimeout.Value = Properties.Settings.Default.stuckTimeout;
             txtUsername.Text = Properties.Settings.Default.username;
+            numActionDelay.Value = Properties.Settings.Default.actionDelay;
         }
 
         private void txtCommand_TextChanged(object sender, EventArgs e)
@@ -143,6 +145,7 @@ namespace ExecutorFrontend
             }
 
             freshStart = true;
+            tmrRefresh.Interval = updateTimerInterval;
             tmrRefresh.Enabled = true;
             chkRestartStuck.Enabled = false;
             txtCommand.Enabled = false;
@@ -194,6 +197,8 @@ namespace ExecutorFrontend
         {
             // Log("Tick");
             // first, evaluate all processes to make sure they're still runnning
+            var didSomething = false;
+
             var dead = new List<Instance>();
             foreach (var proc in processes)
             {
@@ -201,6 +206,7 @@ namespace ExecutorFrontend
                 {
                     dead.Add(proc);
                     Log($"Process {proc.Process.Id} has terminated unexpectedly. Curious");
+                    didSomething = true;
                 }
                 else if(chkRestartStuck.Checked)
                 {
@@ -216,6 +222,7 @@ namespace ExecutorFrontend
                         Log($"Have not detected any TAS-related output for instance #{proc.Id}, killing it");
                         KillInstance(proc);
                         dead.Add(proc);
+                        didSomething = true;
                     }
                 }
             }
@@ -269,6 +276,7 @@ namespace ExecutorFrontend
                         LogStream = streamReader,
                     });
 
+                    didSomething = true;
                     //if (freshStart)
                     //{
                     //    goto onFreshStart;
@@ -287,7 +295,15 @@ namespace ExecutorFrontend
                 var proc = processes[0];
                 KillInstance(proc);
                 processes.Remove(proc);
+                didSomething = true;
+            }
 
+            if(didSomething)
+            {
+                tmrRefresh.Interval = Math.Max(100, (int)numActionDelay.Value * 1000);
+            } else
+            {
+                tmrRefresh.Interval = updateTimerInterval;
             }
         }
 
@@ -406,6 +422,11 @@ namespace ExecutorFrontend
         private void txtUsername_TextChanged(object sender, EventArgs e)
         {
             Properties.Settings.Default.username = txtUsername.Text;
+        }
+
+        private void numActionDelay_ValueChanged(object sender, EventArgs e)
+        {
+            Properties.Settings.Default.actionDelay = (int)numActionDelay.Value;
         }
     }
 }

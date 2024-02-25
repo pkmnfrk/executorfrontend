@@ -211,11 +211,11 @@ namespace ExecutorFrontend
                         proc.LastTasOutput = DateTime.Now;
                     }
 
-                    if (proc.LastTasOutput < DateTime.Now.AddMinutes(-2))
+                    if (proc.LastTasOutput < DateTime.Now.AddMinutes(-(int)numStuckTimeout.Value))
                     {
                         Log($"Have not detected any TAS-related output for instance #{proc.Id}, killing it");
-                        //KillInstance(proc);
-                        //dead.Add(proc);
+                        KillInstance(proc);
+                        dead.Add(proc);
                     }
                 }
             }
